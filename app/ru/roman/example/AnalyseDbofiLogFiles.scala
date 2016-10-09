@@ -11,7 +11,7 @@ import scala.io.Source
 /**
   * Created by Roman on 09.10.2016.
   */
-object CalculateIncomingProcessing extends App {
+object AnalyseDbofiLogFiles extends App {
 
   var df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS")
   var previous: LocalDateTime = null

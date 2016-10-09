@@ -42,19 +42,19 @@ object MetaTraderQuotesSeeker extends FileSystemWorker {
     val files = ArrayBuffer[File]()
     val fileNames = ArrayBuffer[String]()
 
-    val periods = Period.IDENTITY_MAP.keySet.mkString("|")
+    val periods = Period.identityMap.keySet.mkString("|")
     val fileNamePattern = s"([A-z0-9 _]*)__($periods)".r
 
     for (entry <- ohlcDataDirs;
-           ohlcDataDir <- entry._2;
-           dataFile <- ohlcDataDir.listFiles()) {
+         ohlcDataDir <- entry._2;
+         dataFile <- ohlcDataDir.listFiles()) {
 
       if (fileNames.contains(dataFile.getName)) {
         println(s"Duplicated file found in terminal directory: ${entry._1} and ignored ")
 
       } else {
         fileNamePattern.findFirstMatchIn(dataFile.getName) match {
-          case Some(m) if Symbol.IDENTITY_MAP.contains(m.group(1)) => {
+          case Some(m) if Symbol.identityMap.contains(m.group(1)) => {
             fileNames += dataFile.getName
             files += dataFile
           }

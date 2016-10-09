@@ -1,6 +1,6 @@
 package ru.roman.fnmarket.mtquotes
 
-import scala.collection.mutable
+import scala.collection.immutable.ListMap
 
 
 /**
@@ -17,16 +17,8 @@ object Period {
   val W1 = Period("W1")
   val MN1 = Period("MN1")
 
-  val IDENTITY_MAP = mutable.LinkedHashMap(
-    M1.name -> M1,
-    M5.name -> M5,
-    M15.name -> M15,
-    H1.name -> H1,
-    H4.name -> H4,
-    D1.name -> D1,
-    W1.name -> W1,
-    MN1.name -> MN1
-  )
+  val items = M1 :: M5 :: M15 :: H1 :: H4 :: D1 :: W1 :: MN1 :: Nil
+  val identityMap = ListMap[String, Period]() ++ items.map(s => s.name -> s).toMap
 
   def apply(name: String): Period =
     new Period(name)
