@@ -16,7 +16,12 @@ object MetaTraderQuotesSeeker extends FileSystemWorker {
   val mtTerminalsDirName = s"""$userHome/AppData/Roaming/MetaQuotes/Terminal/"""
   var ohlcDataDirName = "/MQL5/Files/DATA_OHLC/"
 
-  def searchSymbolOhlcDataDirs: Map[String, Seq[File]] = {
+  def searchFilesToLoad: Seq[File] = {
+    val ohlcDataDirs = searchSymbolOhlcDataDirs
+    searchFiles(ohlcDataDirs)
+  }
+
+  private def searchSymbolOhlcDataDirs: Map[String, Seq[File]] = {
 
     println(s"Starting the MetaTrader quotes parser, user.home=$userHome")
     checkDirNameForRead(mtTerminalsDirName)
@@ -37,8 +42,7 @@ object MetaTraderQuotesSeeker extends FileSystemWorker {
     } toMap
   }
 
-  def searchFilesToLoad(ohlcDataDirs: Map[String, Seq[File]]): Seq[File] = {
-
+  private def searchFiles(ohlcDataDirs: Map[String, Seq[File]]): ArrayBuffer[File] = {
     val files = ArrayBuffer[File]()
     val fileNames = ArrayBuffer[String]()
 

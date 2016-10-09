@@ -10,9 +10,7 @@ import ru.roman.fnmarket.mtquotes.parser.MetaTraderQuotesSeeker
   */
 object Main extends App {
 
-
-  val ohlcDataDirs: Map[String, Seq[File]] = MetaTraderQuotesSeeker.searchSymbolOhlcDataDirs
-  val filesToLoad: Seq[File] = MetaTraderQuotesSeeker.searchFilesToLoad(ohlcDataDirs)
+  val filesToLoad: Seq[File] = MetaTraderQuotesSeeker.searchFilesToLoad
 
   //CsvParser.readfile
 
