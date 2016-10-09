@@ -7,7 +7,6 @@ import scala.collection.immutable.ListMap
   *
   */
 object Period {
-
   val M1 = Period("M1")
   val M5 = Period("M5")
   val M15 = Period("M15")
@@ -16,12 +15,31 @@ object Period {
   val D1 = Period("D1")
   val W1 = Period("W1")
   val MN1 = Period("MN1")
-
-  val items = M1 :: M5 :: M15 :: H1 :: H4 :: D1 :: W1 :: MN1 :: Nil
+  val items = Seq(M1, M5, M15, H1, H4, D1, W1, MN1)
   val identityMap = ListMap[String, Period]() ++ items.map(s => s.name -> s).toMap
 
   def apply(name: String): Period =
     new Period(name)
+
+  def byName(name: String): Period = {
+    val item = identityMap(name)
+    if (item != null) item else throw new RuntimeException(s"Period not found by name $name")
+  }
 }
 
-class Period(val name: String) {}
+class Period(val name: String) {
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[Period]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Period =>
+      (that canEqual this) &&
+        name == that.name
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(name)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
+}

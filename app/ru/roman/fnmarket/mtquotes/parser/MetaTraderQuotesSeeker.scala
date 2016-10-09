@@ -16,7 +16,7 @@ object MetaTraderQuotesSeeker extends FileSystemWorker {
   val mtTerminalsDirName = s"""$userHome/AppData/Roaming/MetaQuotes/Terminal/"""
   var ohlcDataDirName = "/MQL5/Files/DATA_OHLC/"
 
-  def searchFilesToLoad: Seq[File] = {
+  def searchFilesToLoad: Seq[(FileFormat[Symbol, Period], File)] = {
     val ohlcDataDirs = searchSymbolOhlcDataDirs
     searchFiles(ohlcDataDirs)
   }
@@ -42,28 +42,26 @@ object MetaTraderQuotesSeeker extends FileSystemWorker {
     } toMap
   }
 
-  private def searchFiles(ohlcDataDirs: Map[String, Seq[File]]): ArrayBuffer[File] = {
-    val files = ArrayBuffer[File]()
+  private def searchFiles(ohlcDataDirs: Map[String, Seq[File]]): ArrayBuffer[(FileFormat[Symbol, Period], File)] = {
+    val files = ArrayBuffer[(FileFormat[Symbol, Period], File)]()
     val fileNames = ArrayBuffer[String]()
-
-    val periods = Period.identityMap.keySet.mkString("|")
-    val fileNamePattern = s"([A-z0-9 _]*)__($periods)".r
 
     for (entry <- ohlcDataDirs;
          ohlcDataDir <- entry._2;
          dataFile <- ohlcDataDir.listFiles()) {
 
-      if (fileNames.contains(dataFile.getName)) {
+      val fileName = dataFile.getName
+
+      if (fileNames.contains(fileName)) {
         println(s"Duplicated file found in terminal directory: ${entry._1} and ignored ")
 
       } else {
-        fileNamePattern.findFirstMatchIn(dataFile.getName) match {
-          case Some(m) if Symbol.identityMap.contains(m.group(1)) => {
-            fileNames += dataFile.getName
-            files += dataFile
-          }
-          case None => println(s"Incorrect file ${dataFile.getName} found")
-          case _ => // unknown ignored
+        val ff = FileFormat.determine[Symbol, Period](fileName)
+        ff match {
+          case Some(format) =>
+            fileNames += fileName
+            files += ((ff.get, dataFile))
+          case _ => // unknown files ignored
         }
       }
     }
