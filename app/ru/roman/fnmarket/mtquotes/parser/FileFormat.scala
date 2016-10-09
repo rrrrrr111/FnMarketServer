@@ -32,19 +32,18 @@ object FileFormat {
       m = ff.fileNameRegex.findFirstMatchIn(fileName).orNull
       m != null
     } match {
-      case off: Option[FileFormat[Symbol, Period]]
+      case Some(format)
         if Symbol.identityMap.contains(m.group(1))
           && Symbol.identityMap(m.group(1)).supports(Period.byName(m.group(2))) =>
 
-        off.asInstanceOf[Option[FileFormat[Symbol, Period]]]
-      case off: Option[FileFormat[Symbol, Period]]
+        format.asInstanceOf[Option[FileFormat[Symbol, Period]]]
+      case Some(_)
         if Symbol.identityMap.contains(m.group(1))
           && Period.identityMap.contains(m.group(2)) => None // unsupported file skipped
 
-      case _ => {
+      case _ =>
         println(s"Incorrect file $fileName found")
         None
-      }
     }
   }
 }
