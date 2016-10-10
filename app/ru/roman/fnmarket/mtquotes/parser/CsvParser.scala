@@ -1,10 +1,9 @@
 package ru.roman.fnmarket.mtquotes.parser
 
-import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import ru.roman.fnmarket.mtquotes.{Period, Quote, Symbol}
+import ru.roman.fnmarket.mtquotes.{Quote, QuotesIterator}
 
 import scala.io.Source
 
@@ -13,33 +12,34 @@ import scala.io.Source
   */
 object CsvParser {
 
-  def createQuotesIterator(filesToLoad: Seq[(FileFormat[Symbol, Period], File)]): QuotesIterator = {
+  def createQuotesIterator(filesToLoad: Seq[FileMetaInfo]): QuotesIterator = {
 
     new QuotesIterator {
-      def iterate(onNext: Quote => {}): Unit = {
+      override def startIterateWith(onNext: ((BigInt, Quote) => Unit)): Unit = {
 
-        filesToLoad.foreach { entry =>
+        val df: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
-          val tuple = entry._1.extractIdentity(entry._2.getName)
-          val symbol = tuple._1
-          val period = tuple._2
-          val df: DateTimeFormatter = DateTimeFormatter.ofPattern("")
+        filesToLoad.foreach { fileMetaInfo =>
 
-          Source.fromFile(entry._2).getLines().foreach { l =>
-            val parts: Array[String] = l.split(';')
+          var rowNum: BigInt = 0
+          Source.fromFile(fileMetaInfo.file).getLines().foreach { l =>
+            rowNum += 1
+            if (rowNum != 1) {  // skipping the header
 
-            onNext(
-              new Quote(
-                symbol,
-                period,
-                LocalDateTime.from(df.parse(parts(0))),
-                BigDecimal(parts(1)),
-                BigDecimal(parts(2)),
-                BigDecimal(parts(3)),
-                BigDecimal(parts(4)),
-                BigDecimal(parts(5))
-              ))
+              val parts: Array[String] = l.split(';')
 
+              onNext(rowNum,
+                new Quote(
+                  fileMetaInfo.symbol,
+                  fileMetaInfo.period,
+                  LocalDateTime.from(df.parse(parts(0))),
+                  BigDecimal(parts(1)),
+                  BigDecimal(parts(2)),
+                  BigDecimal(parts(3)),
+                  BigDecimal(parts(4)),
+                  BigDecimal(parts(5))
+                ))
+            }
           }
         }
       }

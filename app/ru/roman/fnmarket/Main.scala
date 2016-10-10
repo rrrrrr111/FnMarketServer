@@ -1,9 +1,7 @@
 package ru.roman.fnmarket
 
-import java.io.File
-
-import ru.roman.fnmarket.mtquotes.parser.{CsvParser, FileFormat, MetaTraderQuotesSeeker, QuotesIterator}
-import ru.roman.fnmarket.mtquotes.{Period, Symbol}
+import ru.roman.fnmarket.mtquotes.QuotesIterator
+import ru.roman.fnmarket.mtquotes.parser._
 
 
 /**
@@ -11,9 +9,10 @@ import ru.roman.fnmarket.mtquotes.{Period, Symbol}
   */
 object Main extends App {
 
-  val filesToLoad: Seq[(FileFormat[Symbol, Period], File)] = MetaTraderQuotesSeeker.searchFilesToLoad
-  val quotesIterator: QuotesIterator = CsvParser.createQuotesIterator(filesToLoad)
+  val filesToLoad: Seq[FileMetaInfo] = MetaTraderQuotesSeeker.searchFilesToLoad
+  println(s"Files found for upload: $filesToLoad")
 
-  println(filesToLoad)
+  val quotesIterator: QuotesIterator = CsvParser.createQuotesIterator(filesToLoad)
+  quotesIterator.startIterateWith(println(_, " ", _))
 
 }

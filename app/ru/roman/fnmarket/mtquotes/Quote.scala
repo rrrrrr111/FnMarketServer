@@ -14,12 +14,26 @@ class Quote(
              val hightPrice: BigDecimal,
              val lowPrice: BigDecimal,
              val closePrice: BigDecimal,
-             val volume: BigDecimal
-           ) {
+             val volume: BigDecimal) {
 
-  def this(symbol: Symbol, period: Period, localDateTime: LocalDateTime,
-           openPrice: BigDecimal, hightPrice: BigDecimal, lowPrice: BigDecimal, closePrice: BigDecimal,
+  def this(symbol: Symbol,
+           period: Period,
+           localDateTime: LocalDateTime,
+           openPrice: BigDecimal,
+           hightPrice: BigDecimal,
+           lowPrice: BigDecimal,
+           closePrice: BigDecimal,
            volume: BigDecimal) {
-    this(null.asInstanceOf[Long], symbol, period, localDateTime, openPrice, hightPrice, lowPrice, closePrice, volume)
+    this(null.asInstanceOf[Long],
+      symbol,
+      period,
+      localDateTime,
+      openPrice,
+      hightPrice,
+      lowPrice,
+      closePrice,
+      volume)
   }
+
+  override def toString = s"Quote($id, $symbol, $period, $localDateTime, $openPrice, $hightPrice, $lowPrice, $closePrice, $volume)"
 }

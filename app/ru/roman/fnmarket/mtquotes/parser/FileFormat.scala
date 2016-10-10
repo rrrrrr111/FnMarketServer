@@ -13,20 +13,27 @@ object FileFormat {
   val SYMBOL__PERIOD = {
     val periods = Period.identityMap.keySet.mkString("|")
 
-    new FileFormat[Symbol, Period](s"([A-z0-9 _]*)__($periods)".r) {
+    new FileFormat(s"([A-z0-9 _]*)__($periods)".r) {
 
-      def extractIdentity(fileName: String): (Symbol, Period) = {
-        fileNameRegex.findFirstMatchIn(fileName) match {
-          case Some(m) => (Symbol.byName(m.group(1)), Period.byName(m.group(2)))
-          case _ => throw new IllegalStateException(s"incorrect file name $fileName")
+      override def extractSymbol(fileName: String): Symbol = {
+        val m = fileNameRegex.findFirstMatchIn(fileName).getOrElse {
+          throw new IllegalStateException(s"incorrect file name $fileName")
         }
+        Symbol.byName(m.group(1))
+      }
+
+      override def extractPeriod(fileName: String): Period = {
+        val m = fileNameRegex.findFirstMatchIn(fileName).getOrElse {
+          throw new IllegalStateException(s"incorrect file name $fileName")
+        }
+        Period.byName(m.group(2))
       }
     }
   }
 
-  val items: Seq[FileFormat[_ <: AnyRef, _ <: AnyRef]] = Seq(SYMBOL__PERIOD)
+  val items: Seq[FileFormat] = Seq(SYMBOL__PERIOD)
 
-  def determine[Symbol, Period](fileName: String): Option[FileFormat[Symbol, Period]] = {
+  def determine(fileName: String): Option[FileFormat] = {
     var m: Match = null
     items.find { ff =>
       m = ff.fileNameRegex.findFirstMatchIn(fileName).orNull
@@ -34,9 +41,8 @@ object FileFormat {
     } match {
       case Some(format)
         if Symbol.identityMap.contains(m.group(1))
-          && Symbol.identityMap(m.group(1)).supports(Period.byName(m.group(2))) =>
+          && Symbol.identityMap(m.group(1)).supports(Period.byName(m.group(2))) => Some(format)
 
-        format.asInstanceOf[Option[FileFormat[Symbol, Period]]]
       case Some(_)
         if Symbol.identityMap.contains(m.group(1))
           && Period.identityMap.contains(m.group(2)) => None // unsupported file skipped
@@ -48,8 +54,12 @@ object FileFormat {
   }
 }
 
-abstract class FileFormat[A <: AnyRef, B <: AnyRef](
-                                                     val fileNameRegex: Regex
-                                                   ) {
-  def extractIdentity(fileName: String): (A, B)
+abstract class FileFormat(
+                           val fileNameRegex: Regex
+                         ) {
+  def extractSymbol(fileName: String): (Symbol)
+
+  def extractPeriod(fileName: String): (Period)
+
+  override def toString = s"FileFormat($fileNameRegex)"
 }

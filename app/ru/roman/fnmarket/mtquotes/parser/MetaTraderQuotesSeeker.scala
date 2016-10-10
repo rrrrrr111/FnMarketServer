@@ -3,7 +3,6 @@ package ru.roman.fnmarket.mtquotes.parser
 import java.io.File
 
 import ru.roman.fnmarket.filesystem.FileSystemWorker
-import ru.roman.fnmarket.mtquotes._
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -16,7 +15,7 @@ object MetaTraderQuotesSeeker extends FileSystemWorker {
   val mtTerminalsDirName = s"""$userHome/AppData/Roaming/MetaQuotes/Terminal/"""
   var ohlcDataDirName = "/MQL5/Files/DATA_OHLC/"
 
-  def searchFilesToLoad: Seq[(FileFormat[Symbol, Period], File)] = {
+  def searchFilesToLoad: Seq[FileMetaInfo] = {
     val ohlcDataDirs = searchSymbolOhlcDataDirs
     searchFiles(ohlcDataDirs)
   }
@@ -42,8 +41,8 @@ object MetaTraderQuotesSeeker extends FileSystemWorker {
     } toMap
   }
 
-  private def searchFiles(ohlcDataDirs: Map[String, Seq[File]]): ArrayBuffer[(FileFormat[Symbol, Period], File)] = {
-    val files = ArrayBuffer[(FileFormat[Symbol, Period], File)]()
+  private def searchFiles(ohlcDataDirs: Map[String, Seq[File]]): ArrayBuffer[FileMetaInfo] = {
+    val filesMetaInfos = ArrayBuffer[FileMetaInfo]()
     val fileNames = ArrayBuffer[String]()
 
     for (entry <- ohlcDataDirs;
@@ -56,15 +55,15 @@ object MetaTraderQuotesSeeker extends FileSystemWorker {
         println(s"Duplicated file found in terminal directory: ${entry._1} and ignored ")
 
       } else {
-        val ff = FileFormat.determine[Symbol, Period](fileName)
+        val ff = FileFormat.determine(fileName)
         ff match {
           case Some(format) =>
             fileNames += fileName
-            files += ((ff.get, dataFile))
-          case _ => // unknown files ignored
+            filesMetaInfos += new FileMetaInfo(dataFile, ff.get)
+          case _ => // unknown filesMetaInfos ignored
         }
       }
     }
-    files
+    filesMetaInfos
   }
 }
