@@ -18,16 +18,13 @@ object Period {
   val items = Seq(M1, M5, M15, H1, H4, D1, W1, MN1)
   val identityMap = ListMap[String, Period]() ++ items.map(s => s.name -> s).toMap
 
-  def apply(name: String): Period =
-    new Period(name)
-
   def byName(name: String): Period = {
     val item = identityMap(name)
     if (item != null) item else throw new RuntimeException(s"Period not found by name $name")
   }
 }
 
-class Period(val name: String) {
+case class Period(name: String) {
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[Period]
 

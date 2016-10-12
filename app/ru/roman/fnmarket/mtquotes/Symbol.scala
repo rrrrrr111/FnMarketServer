@@ -7,8 +7,7 @@ import scala.collection.immutable.ListMap
   *
   */
 object Symbol {
-  val SBRF_Splice = Symbol("SBRF Splice",
-    Period.M1)
+  val SBRF_Splice = Symbol("SBRF Splice", Period.M1)
   val USDRUB_TOD = Symbol("USDRUB_TOD")
   val USDRUB_TOM = Symbol("USDRUB_TOM")
   val EURRUB_TOD = Symbol("EURRUB_TOD")
