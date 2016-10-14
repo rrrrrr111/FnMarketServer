@@ -1,40 +1,44 @@
 package ru.roman.fnmarket.mtquotes
 
+import ru.roman.fnmarket.mtquotes.Period.{D1, M1}
+
 import scala.collection.immutable.ListMap
 
 
 /**
   *
   */
-object Symbol {
-  val SBRF_Splice = Symbol("SBRF Splice", Period.M1)
-  val USDRUB_TOD = Symbol("USDRUB_TOD")
-  val USDRUB_TOM = Symbol("USDRUB_TOM")
-  val EURRUB_TOD = Symbol("EURRUB_TOD")
-  val EURRUB_TOM = Symbol("EURRUB_TOM")
+object MSymbol {
+  val SBRF_Splice = MSymbol("SBRF Splice", M1, D1)
+  val USDRUB_TOD = MSymbol("USDRUB_TOD")
+  val USDRUB_TOM = MSymbol("USDRUB_TOM")
+  val EURRUB_TOD = MSymbol("EURRUB_TOD")
+  val EURRUB_TOM = MSymbol("EURRUB_TOM")
 
   val items = Seq(SBRF_Splice, USDRUB_TOD, USDRUB_TOM, EURRUB_TOD, EURRUB_TOM)
-  val identityMap = ListMap[String, Symbol]() ++ items.map(s => s.name -> s).toMap
+  val identityMap = ListMap[String, MSymbol]() ++ items.map(s => s.name -> s).toMap
 
-  def apply(name: String, periods: Period*): Symbol =
-    new Symbol(name, periods)
+  def apply(name: String, periods: Period*): MSymbol =
+    new MSymbol(name, periods)
 
-  def byName(name: String): Symbol = {
+  def byName(name: String): MSymbol = {
     val item = identityMap(name)
     if (item != null) item else throw new RuntimeException(s"Symbol not found by name $name")
   }
 }
 
-class Symbol(
+class MSymbol(
               val name: String,
               val periods: Seq[Period]
             ) {
+  val id: String = name.replace(' ', '_')
+
   def supports(period: Period): Boolean = periods.contains(period)
 
-  def canEqual(other: Any): Boolean = other.isInstanceOf[Symbol]
+  def canEqual(other: Any): Boolean = other.isInstanceOf[MSymbol]
 
   override def equals(other: Any): Boolean = other match {
-    case that: Symbol =>
+    case that: MSymbol =>
       (that canEqual this) &&
         name == that.name
     case _ => false

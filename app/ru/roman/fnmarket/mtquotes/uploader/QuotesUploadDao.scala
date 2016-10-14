@@ -6,7 +6,7 @@ import org.apache.commons.lang3.time.{DurationFormatUtils, StopWatch}
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.PreparedStatementSetter
 import ru.roman.fnmarket.db.DesktopDao
-import ru.roman.fnmarket.mtquotes.{Quote, QuotesIterator}
+import ru.roman.fnmarket.mtquotes.{MSymbol, Period, Quote, QuotesIterator}
 
 /**
   * Created by Roman on 12.10.2016.
@@ -16,7 +16,7 @@ object QuotesUploadDao extends DesktopDao {
 
   val uploadSql =
     """
-      |INSERT INTO SBRF_SPLICE__M1 (ID, OPEN_PRICE, HIGHT_PRICE, LOW_PRICE, CLOSE_PRICE, CLOSE_DATETIME, VOLUME)
+      |INSERT INTO %s__%s (ID, OPEN_PRICE, HIGHT_PRICE, LOW_PRICE, CLOSE_PRICE, CLOSE_DATETIME, VOLUME)
       |VALUES (ID_SEQ.nextval, ?, ?, ?, ?, ? ,?)
     """.stripMargin
 
@@ -25,6 +25,9 @@ object QuotesUploadDao extends DesktopDao {
     var counter: Int = 0
     val batchSize: Int = 10000
     val sw = new StopWatch()
+    var symbol: MSymbol = null
+    var period: Period = null
+    var sql: String = null
 
     db.withTransaction(c => {
       val jt = newJdbcTemplate(c)
@@ -32,7 +35,14 @@ object QuotesUploadDao extends DesktopDao {
 
       iterator.startIterateWith((n: BigInt, q: Quote) => {
 
-        jt.update(uploadSql, new PreparedStatementSetter {
+        if (symbol != q.symbol || period != q.period) {
+          symbol = q.symbol
+          period = q.period
+          sql = uploadSql.format(symbol.id, period)
+        }
+
+        jt.update(sql, new PreparedStatementSetter {
+          // на 10% быстрее чем jt.update(String, AnyRef*)
           override def setValues(ps: PreparedStatement): Unit = {
 
             ps.setBigDecimal(1, q.openPrice.bigDecimal)
@@ -51,7 +61,7 @@ object QuotesUploadDao extends DesktopDao {
           log.info(s"$batchSize records commited, total: $counter, " +
             s"upload duration: ${DurationFormatUtils.formatDurationHMS(sw.getTime)}, " +
             s"speed: ${batchSize * 1000 / sw.getTime}q/s")
-          sw.reset();
+          sw.reset()
           sw.start()
         }
 
