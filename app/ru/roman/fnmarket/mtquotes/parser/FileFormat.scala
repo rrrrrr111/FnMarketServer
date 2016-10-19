@@ -1,6 +1,6 @@
 package ru.roman.fnmarket.mtquotes.parser
 
-import ru.roman.fnmarket.mtquotes.{MSymbol, Period}
+import ru.roman.fnmarket.mtquotes.{QuotePeriod, QuoteSymbol}
 
 import scala.util.matching.Regex
 import scala.util.matching.Regex.Match
@@ -11,22 +11,22 @@ import scala.util.matching.Regex.Match
   */
 object FileFormat {
   val SYMBOL__PERIOD = {
-    val periods = Period.identityMap.keySet.mkString("|")
+    val periods = QuotePeriod.identityMap.keySet.mkString("|")
 
     new FileFormat(s"([A-z0-9 _]*)__($periods)".r) {
 
-      override def extractSymbol(fileName: String): MSymbol = {
+      override def extractSymbol(fileName: String): QuoteSymbol = {
         val m = fileNameRegex.findFirstMatchIn(fileName).getOrElse {
           throw new IllegalStateException(s"incorrect file name $fileName")
         }
-        MSymbol.byName(m.group(1))
+        QuoteSymbol.byName(m.group(1))
       }
 
-      override def extractPeriod(fileName: String): Period = {
+      override def extractPeriod(fileName: String): QuotePeriod = {
         val m = fileNameRegex.findFirstMatchIn(fileName).getOrElse {
           throw new IllegalStateException(s"incorrect file name $fileName")
         }
-        Period.byName(m.group(2))
+        QuotePeriod.byName(m.group(2))
       }
     }
   }
@@ -40,12 +40,12 @@ object FileFormat {
       m != null
     } match {
       case Some(format)
-        if MSymbol.identityMap.contains(m.group(1))
-          && MSymbol.identityMap(m.group(1)).supports(Period.byName(m.group(2))) => Some(format)
+        if QuoteSymbol.identityMap.contains(m.group(1))
+          && QuoteSymbol.identityMap(m.group(1)).supports(QuotePeriod.byName(m.group(2))) => Some(format)
 
       case Some(_)
-        if MSymbol.identityMap.contains(m.group(1))
-          && Period.identityMap.contains(m.group(2)) => None // unsupported file skipped
+        if QuoteSymbol.identityMap.contains(m.group(1))
+          && QuotePeriod.identityMap.contains(m.group(2)) => None // unsupported file skipped
 
       case _ =>
         println(s"Incorrect file $fileName found")
@@ -57,9 +57,9 @@ object FileFormat {
 abstract class FileFormat(
                            val fileNameRegex: Regex
                          ) {
-  def extractSymbol(fileName: String): (MSymbol)
+  def extractSymbol(fileName: String): (QuoteSymbol)
 
-  def extractPeriod(fileName: String): (Period)
+  def extractPeriod(fileName: String): (QuotePeriod)
 
   override def toString = s"FileFormat($fileNameRegex)"
 }

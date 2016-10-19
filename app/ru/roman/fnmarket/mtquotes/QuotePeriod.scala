@@ -6,30 +6,30 @@ import scala.collection.immutable.ListMap
 /**
   *
   */
-object Period {
-  val M1 = Period("M1")
-  val M5 = Period("M5")
-  val M15 = Period("M15")
-  val H1 = Period("H1")
-  val H4 = Period("H4")
-  val D1 = Period("D1")
-  val W1 = Period("W1")
-  val MN1 = Period("MN1")
+object QuotePeriod {
+  val M1 = QuotePeriod("M1")
+  val M5 = QuotePeriod("M5")
+  val M15 = QuotePeriod("M15")
+  val H1 = QuotePeriod("H1")
+  val H4 = QuotePeriod("H4")
+  val D1 = QuotePeriod("D1")
+  val W1 = QuotePeriod("W1")
+  val MN1 = QuotePeriod("MN1")
   val items = Seq(M1, M5, M15, H1, H4, D1, W1, MN1)
-  val identityMap = ListMap[String, Period]() ++ items.map(s => s.name -> s).toMap
+  val identityMap = ListMap[String, QuotePeriod]() ++ items.map(s => s.name -> s).toMap
 
-  def byName(name: String): Period = {
+  def byName(name: String): QuotePeriod = {
     val item = identityMap(name)
     if (item != null) item else throw new RuntimeException(s"Period not found by name $name")
   }
 }
 
-case class Period(name: String) {
+sealed case class QuotePeriod(name: String) {
 
-  def canEqual(other: Any): Boolean = other.isInstanceOf[Period]
+  def canEqual(other: Any): Boolean = other.isInstanceOf[QuotePeriod]
 
   override def equals(other: Any): Boolean = other match {
-    case that: Period =>
+    case that: QuotePeriod =>
       (that canEqual this) &&
         name == that.name
     case _ => false

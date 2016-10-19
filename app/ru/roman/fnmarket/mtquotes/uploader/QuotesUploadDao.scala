@@ -6,7 +6,7 @@ import org.apache.commons.lang3.time.{DurationFormatUtils, StopWatch}
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.PreparedStatementSetter
 import ru.roman.fnmarket.db.DesktopDao
-import ru.roman.fnmarket.mtquotes.{MSymbol, Period, Quote, QuotesIterator}
+import ru.roman.fnmarket.mtquotes.{Quote, QuotePeriod, QuoteSymbol, QuotesIterator}
 
 /**
   * Created by Roman on 12.10.2016.
@@ -25,8 +25,8 @@ object QuotesUploadDao extends DesktopDao {
     var counter: Int = 0
     val batchSize: Int = 10000
     val sw = new StopWatch()
-    var symbol: MSymbol = null
-    var period: Period = null
+    var symbol: QuoteSymbol = null
+    var period: QuotePeriod = null
     var sql: String = null
 
     db.withTransaction(c => {

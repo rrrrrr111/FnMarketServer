@@ -7,8 +7,8 @@ import java.time.LocalDateTime
   */
 class Quote(
              val id: Long,
-             val symbol: MSymbol,
-             val period: Period,
+             val symbol: QuoteSymbol,
+             val period: QuotePeriod,
              val closeDatetime: LocalDateTime,
              val openPrice: BigDecimal,
              val hightPrice: BigDecimal,
@@ -16,8 +16,8 @@ class Quote(
              val closePrice: BigDecimal,
              val volume: BigDecimal) {
 
-  def this(symbol: MSymbol,
-           period: Period,
+  def this(symbol: QuoteSymbol,
+           period: QuotePeriod,
            closeDatetime: LocalDateTime,
            openPrice: BigDecimal,
            hightPrice: BigDecimal,
