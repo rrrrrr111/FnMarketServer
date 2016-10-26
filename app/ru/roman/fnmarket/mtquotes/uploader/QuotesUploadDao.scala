@@ -1,12 +1,12 @@
 package ru.roman.fnmarket.mtquotes.uploader
 
-import java.sql.{PreparedStatement, Timestamp}
+import java.sql.PreparedStatement
 
 import org.apache.commons.lang3.time.{DurationFormatUtils, StopWatch}
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.PreparedStatementSetter
 import ru.roman.fnmarket.db.DesktopDao
-import ru.roman.fnmarket.mtquotes.{Quote, QuotePeriod, QuoteSymbol, QuotesIterator}
+import ru.roman.fnmarket.mtquotes.{Quote, QuotePeriod, QuoteSymbol, QuotesWindow}
 
 /**
   * Created by Roman on 12.10.2016.
@@ -20,7 +20,7 @@ object QuotesUploadDao extends DesktopDao {
       |VALUES (ID_SEQ.nextval, ?, ?, ?, ?, ? ,?)
     """.stripMargin
 
-  def upload(iterator: QuotesIterator): Int = {
+  def upload(window: QuotesWindow): Int = {
 
     var counter: Int = 0
     val batchSize: Int = 10000
@@ -33,7 +33,7 @@ object QuotesUploadDao extends DesktopDao {
       val jt = newJdbcTemplate(c)
       sw.start()
 
-      iterator.startIterateWith((n: BigInt, q: Quote) => {
+      window.iterateWith((n: BigInt, q: Quote) => {
 
         if (symbol != q.symbol || period != q.period) {
           symbol = q.symbol
@@ -49,7 +49,7 @@ object QuotesUploadDao extends DesktopDao {
             ps.setBigDecimal(2, q.hightPrice.bigDecimal)
             ps.setBigDecimal(3, q.lowPrice.bigDecimal)
             ps.setBigDecimal(4, q.closePrice.bigDecimal)
-            ps.setTimestamp(5, Timestamp.valueOf(q.closeDatetime))
+            ps.setTimestamp(5, dateTimeToTimestamp(q.closeDatetime))
             ps.setBigDecimal(6, q.volume.bigDecimal)
           }
         })

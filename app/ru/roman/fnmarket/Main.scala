@@ -1,6 +1,6 @@
 package ru.roman.fnmarket
 
-import ru.roman.fnmarket.mtquotes.uploader.QuotesUploadService
+import ru.roman.fnmarket.analytic.ProbabilityCalculator
 
 
 /**
@@ -8,6 +8,6 @@ import ru.roman.fnmarket.mtquotes.uploader.QuotesUploadService
   */
 object Main extends App {
 
-  QuotesUploadService.uploadQuotesFromMtToDb
-
+  //QuotesUploadService.uploadQuotesFromMtToDb
+  ProbabilityCalculator.probabilityOfNextDayInSameDirectionAsPrevious
 }

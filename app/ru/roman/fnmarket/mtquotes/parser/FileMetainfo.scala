@@ -2,7 +2,7 @@ package ru.roman.fnmarket.mtquotes.parser
 
 import java.io.File
 
-import ru.roman.fnmarket.mtquotes.{MSymbol, Period}
+import ru.roman.fnmarket.mtquotes.{QuotePeriod, QuoteSymbol}
 
 /**
   * Created by Roman on 11.10.2016.
@@ -10,8 +10,8 @@ import ru.roman.fnmarket.mtquotes.{MSymbol, Period}
 class FileMetaInfo(
                     val file: File,
                     val fileFormat: FileFormat,
-                    val symbol: MSymbol,
-                    val period: Period) {
+                    val symbol: QuoteSymbol,
+                    val period: QuotePeriod) {
   def this(
             file: File,
             fileFormat: FileFormat

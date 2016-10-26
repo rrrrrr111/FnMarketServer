@@ -2,7 +2,6 @@ package ru.roman.fnmarket.mtquotes.uploader
 
 import org.apache.commons.lang3.time.{DurationFormatUtils, StopWatch}
 import org.slf4j.LoggerFactory
-import ru.roman.fnmarket.mtquotes.QuotesIterator
 import ru.roman.fnmarket.mtquotes.parser.{CsvParser, FileMetaInfo, MetaTraderQuotesSeeker}
 
 /**
@@ -21,8 +20,8 @@ object QuotesUploadService {
     sw.reset()
     sw.start()
 
-    val quotesIterator: QuotesIterator = CsvParser.createQuotesIterator(filesToLoad)
-    val count = QuotesUploadDao.upload(quotesIterator)
+    val quotesWindow = CsvParser.createQuotesWindow(filesToLoad)
+    val count = QuotesUploadDao.upload(quotesWindow)
     log.info(s"Quotes uploaded to DB: $count, for: ${DurationFormatUtils.formatDurationHMS(sw.getTime)}")
   }
 
